@@ -5,37 +5,34 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CreditTransaction;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
     {
         $query = User::withCount(['profiles', 'charts']);
 
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            });
+            $query->where(fn($q) => $q->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%"));
         }
 
-        if ($request->has('filter')) {
+        if ($request->filled('filter')) {
             match ($request->input('filter')) {
                 'blocked' => $query->where('is_blocked', true),
-                'active' => $query->where('is_blocked', false),
-                default => null,
+                'active'  => $query->where('is_blocked', false),
+                default   => null,
             };
         }
 
-        $users = $query->latest()->paginate(20);
+        $users = $query->latest()->paginate(20)->withQueryString();
 
-        return response()->json($users);
+        return view('admin.users.index', compact('users'));
     }
 
-    public function show(int $id): JsonResponse
+    public function show(int $id)
     {
         $user = User::with([
             'profiles',
@@ -43,10 +40,10 @@ class UserController extends Controller
             'creditTransactions' => fn($q) => $q->latest()->limit(20),
         ])->findOrFail($id);
 
-        return response()->json(['user' => $user]);
+        return view('admin.users.show', compact('user'));
     }
 
-    public function addCredits(Request $request, int $id): JsonResponse
+    public function addCredits(Request $request, int $id)
     {
         $validated = $request->validate([
             'amount' => ['required', 'integer', 'min:1'],
@@ -63,29 +60,18 @@ class UserController extends Controller
             'description' => $validated['description'] ?? 'Начисление кредитов администратором',
         ]);
 
-        return response()->json([
-            'message' => 'Кредиты начислены.',
-            'credits' => $user->fresh()->credits,
-        ]);
+        return back()->with('success', "Начислено {$validated['amount']} кредитов.");
     }
 
-    public function block(Request $request, int $id): JsonResponse
+    public function block(Request $request, int $id)
     {
-        $validated = $request->validate([
-            'reason' => ['nullable', 'string', 'max:500'],
-        ]);
-
-        $user = User::findOrFail($id);
-        $user->update(['is_blocked' => true]);
-
-        return response()->json(['message' => 'Пользователь заблокирован.']);
+        User::findOrFail($id)->update(['is_blocked' => true]);
+        return back()->with('success', 'Пользователь заблокирован.');
     }
 
-    public function unblock(int $id): JsonResponse
+    public function unblock(int $id)
     {
-        $user = User::findOrFail($id);
-        $user->update(['is_blocked' => false]);
-
-        return response()->json(['message' => 'Пользователь разблокирован.']);
+        User::findOrFail($id)->update(['is_blocked' => false]);
+        return back()->with('success', 'Пользователь разблокирован.');
     }
 }

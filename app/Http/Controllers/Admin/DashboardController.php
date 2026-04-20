@@ -5,12 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Chart;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index(): JsonResponse
+    public function index()
     {
         $now = now();
 
@@ -25,11 +24,12 @@ class DashboardController extends Controller
             'charts' => [
                 'by_type' => Chart::select('type', DB::raw('count(*) as total'))
                     ->groupBy('type')
+                    ->get()
                     ->pluck('total', 'type'),
                 'total' => Chart::count(),
             ],
         ];
 
-        return response()->json($stats);
+        return view('admin.dashboard', compact('stats'));
     }
 }
