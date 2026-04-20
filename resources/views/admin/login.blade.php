@@ -25,8 +25,8 @@
         @endif
         <form method="POST" action="{{ route('admin.login') }}">
             @csrf
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus>
+            <label for="login">Логин</label>
+            <input type="text" id="login" name="login" value="{{ old('login') }}" required autofocus autocomplete="username">
             <label for="password">Пароль</label>
             <input type="password" id="password" name="password" required>
             <button type="submit">Войти</button>
