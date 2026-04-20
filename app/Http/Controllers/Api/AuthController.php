@@ -80,6 +80,6 @@ class AuthController extends Controller
     {
         $user = $request->user()->load('profiles');
 
-        return response()->json(['user' => $user]);
+        return response()->json($user);
     }
 }
