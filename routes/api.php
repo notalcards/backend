@@ -2,12 +2,14 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ChartController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/payments/webhook', [PaymentController::class, 'webhook']);
 
 Route::middleware(['auth:sanctum', 'check.not_blocked'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -21,4 +23,7 @@ Route::middleware(['auth:sanctum', 'check.not_blocked'])->group(function () {
 
     Route::get('user/profile', [UserController::class, 'profile']);
     Route::put('user/profile', [UserController::class, 'updateProfile']);
+
+    Route::get('payments/tariffs', [PaymentController::class, 'tariffs']);
+    Route::post('payments/create', [PaymentController::class, 'create']);
 });
