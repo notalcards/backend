@@ -13,7 +13,7 @@ class ProfileController extends Controller
     {
         $profiles = $request->user()->profiles()->get();
 
-        return response()->json(['profiles' => $profiles]);
+        return response()->json(['data' => $profiles]);
     }
 
     public function store(Request $request): JsonResponse
