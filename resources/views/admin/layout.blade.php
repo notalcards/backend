@@ -72,9 +72,7 @@
     <div class="sidebar-bottom">
         <form method="POST" action="{{ route('admin.logout') }}">
             @csrf
-            <button type="submit" style="background:none;border:none;width:100%;cursor:pointer;">
-                <a href="#" style="color:#A0A0C0;">🚪 Выйти</a>
-            </button>
+            <button type="submit" style="background:none;border:none;width:100%;cursor:pointer;display:flex;align-items:center;gap:10px;padding:10px 20px;color:#A0A0C0;font-size:14px;transition:all .2s;" onmouseover="this.style.color='#C4B5FD'" onmouseout="this.style.color='#A0A0C0'">🚪 Выйти</button>
         </form>
     </div>
 </nav>
