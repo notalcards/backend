@@ -22,7 +22,7 @@ class ClaudeService
             'Authorization' => 'Bearer ' . $this->apiKey,
             'Content-Type' => 'application/json',
         ])->timeout(120)->post('https://openrouter.ai/api/v1/chat/completions', [
-            'model' => 'anthropic/claude-sonnet-4-5',
+            'model' => 'google/gemini-2.0-flash-lite-001',
             'max_tokens' => 4096,
             'messages' => [
                 [
