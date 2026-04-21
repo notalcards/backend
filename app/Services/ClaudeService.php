@@ -11,7 +11,7 @@ class ClaudeService
 
     public function __construct()
     {
-        $this->apiKey = config('services.anthropic.key');
+        $this->apiKey = config('services.openrouter.key');
     }
 
     public function interpret(string $chartType, array $chartData): string
@@ -19,11 +19,10 @@ class ClaudeService
         $prompt = "Ты астролог-эксперт. Дай подробную интерпретацию на русском языке для следующих астрологических данных типа {$chartType}: " . json_encode($chartData, JSON_UNESCAPED_UNICODE);
 
         $response = Http::withHeaders([
-            'x-api-key' => $this->apiKey,
-            'anthropic-version' => '2023-06-01',
+            'Authorization' => 'Bearer ' . $this->apiKey,
             'Content-Type' => 'application/json',
-        ])->post('https://api.anthropic.com/v1/messages', [
-            'model' => 'claude-sonnet-4-6',
+        ])->timeout(120)->post('https://openrouter.ai/api/v1/chat/completions', [
+            'model' => 'anthropic/claude-sonnet-4-5',
             'max_tokens' => 4096,
             'messages' => [
                 [
@@ -39,6 +38,6 @@ class ClaudeService
 
         $data = $response->json();
 
-        return $data['content'][0]['text'] ?? '';
+        return $data['choices'][0]['message']['content'] ?? '';
     }
 }
