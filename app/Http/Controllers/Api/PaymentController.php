@@ -46,9 +46,11 @@ class PaymentController extends Controller
 
         $client = $this->makeClient();
 
+        $amount = number_format($tariff['amount'], 2, '.', '');
+
         $payment = $client->createPayment([
             'amount' => [
-                'value' => number_format($tariff['amount'], 2, '.', ''),
+                'value' => $amount,
                 'currency' => 'RUB',
             ],
             'confirmation' => [
@@ -57,6 +59,24 @@ class PaymentController extends Controller
             ],
             'capture' => true,
             'description' => $tariff['description'] . ' — NatalCharts',
+            'receipt' => [
+                'customer' => [
+                    'email' => $user->email,
+                ],
+                'items' => [
+                    [
+                        'description' => $tariff['name'] . ' — ' . $tariff['credits'] . ' кредитов NatalCharts',
+                        'quantity' => '1.00',
+                        'amount' => [
+                            'value' => $amount,
+                            'currency' => 'RUB',
+                        ],
+                        'vat_code' => 1,
+                        'payment_mode' => 'full_payment',
+                        'payment_subject' => 'service',
+                    ],
+                ],
+            ],
             'metadata' => [
                 'user_id' => $user->id,
                 'tariff' => $request->tariff,
