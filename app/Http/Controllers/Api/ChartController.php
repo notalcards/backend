@@ -77,7 +77,11 @@ class ChartController extends Controller
             default => $this->astrologyApi->natal($inputData),
         };
 
-        $interpretation = $this->claude->interpret($type, $resultData);
+        try {
+            $interpretation = $this->claude->interpret($type, $resultData);
+        } catch (\Throwable $e) {
+            $interpretation = '';
+        }
 
         $user->deductCredits(100);
 
