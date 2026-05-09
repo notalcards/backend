@@ -19,5 +19,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/users/{id}/credits', [Admin\UserController::class, 'addCredits'])->name('users.credits');
         Route::post('/users/{id}/block', [Admin\UserController::class, 'block'])->name('users.block');
         Route::post('/users/{id}/unblock', [Admin\UserController::class, 'unblock'])->name('users.unblock');
+
+        Route::resource('articles', Admin\ArticleController::class);
+        Route::post('/articles/{article}/publish', [Admin\ArticleController::class, 'publish'])->name('articles.publish');
     });
 });

@@ -69,6 +69,7 @@
     <div class="sidebar-logo">🔮 NatalCharts</div>
     <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">📊 Дашборд</a>
     <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">👥 Пользователи</a>
+    <a href="{{ route('admin.articles.index') }}" class="{{ request()->routeIs('admin.articles.*') ? 'active' : '' }}">📝 Статьи</a>
     <div class="sidebar-bottom">
         <form method="POST" action="{{ route('admin.logout') }}">
             @csrf
