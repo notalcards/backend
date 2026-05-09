@@ -14,7 +14,6 @@ jobs:
           host: 62.109.22.131
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
           script_stop: true
           script: |
             cd /var/www/natalcharts/backend
