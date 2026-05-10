@@ -78,7 +78,7 @@ class ChartController extends Controller
         };
 
         try {
-            $interpretation = $this->claude->interpret($type, $resultData);
+            $interpretation = $this->claude->interpret($type, $resultData, $profile->toArray());
         } catch (\Throwable $e) {
             $interpretation = '';
         }
