@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Chart;
+use App\Models\ChartPrecalculation;
 use App\Models\CreditTransaction;
 use App\Models\Profile;
 use App\Services\AstrologyApiService;
 use App\Services\ClaudeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ChartController extends Controller
 {
@@ -114,5 +116,42 @@ class ChartController extends Controller
         $chart->delete();
 
         return response()->json(['message' => 'Карта удалена.']);
+    }
+
+    public function precalculate(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'birth_date'  => ['required', 'string'],
+            'birth_time'  => ['nullable', 'string'],
+            'birth_place' => ['nullable', 'string'],
+            'lat'         => ['nullable', 'numeric'],
+            'lng'         => ['nullable', 'numeric'],
+        ]);
+
+        $profile = [
+            'name'        => 'Subject',
+            'birth_date'  => $validated['birth_date'],
+            'birth_time'  => $validated['birth_time'] ?? '12:00:00',
+            'birth_place' => $validated['birth_place'] ?? null,
+            'lat'         => $validated['lat'] ?? null,
+            'lng'         => $validated['lng'] ?? null,
+        ];
+
+        try {
+            $resultData     = $this->astrologyApi->natal(['profile' => $profile]);
+            $interpretation = $this->claude->interpret('natal', $resultData);
+        } catch (\Throwable) {
+            return response()->json(['message' => 'Ошибка расчёта карты'], 500);
+        }
+
+        $precalc = ChartPrecalculation::create([
+            'token'          => Str::uuid(),
+            'birth_data'     => $validated,
+            'result_data'    => $resultData,
+            'interpretation' => $interpretation,
+            'expires_at'     => now()->addHours(2),
+        ]);
+
+        return response()->json(['token' => $precalc->token]);
     }
 }

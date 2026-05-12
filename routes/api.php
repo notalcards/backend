@@ -13,6 +13,7 @@ Route::get('/articles/{slug}', [ArticleController::class, 'show']);
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/charts/precalculate', [ChartController::class, 'precalculate']);
 Route::post('/payments/webhook', [PaymentController::class, 'webhook']);
 
 Route::middleware(['auth:sanctum', 'check.not_blocked'])->group(function () {
