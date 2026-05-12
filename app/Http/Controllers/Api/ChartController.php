@@ -139,7 +139,7 @@ class ChartController extends Controller
 
         try {
             $resultData     = $this->astrologyApi->natal(['profile' => $profile]);
-            $interpretation = $this->claude->interpret('natal', $resultData);
+            $interpretation = $this->claude->interpret('natal', $resultData, $profile);
         } catch (\Throwable) {
             return response()->json(['message' => 'Ошибка расчёта карты'], 500);
         }
