@@ -7,7 +7,7 @@ use RuntimeException;
 
 class ClaudeService
 {
-    private string $apiKey;
+    private ?string $apiKey;
 
     private const MODEL_NATAL = 'anthropic/claude-haiku-4-5';
     private const MODEL_DEFAULT = 'google/gemini-2.0-flash-lite-001';
@@ -19,6 +19,10 @@ class ClaudeService
 
     public function interpret(string $chartType, array $chartData, array $profile = []): string
     {
+        if (empty($this->apiKey)) {
+            throw new RuntimeException('Не задан OPENROUTER_API_KEY в .env');
+        }
+
         $prompt = $this->buildPrompt($chartType, $chartData, $profile);
         $model = $chartType === 'natal' ? self::MODEL_NATAL : self::MODEL_DEFAULT;
         $temperature = $chartType === 'natal' ? 0.8 : 0.7;

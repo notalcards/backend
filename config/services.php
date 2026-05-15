@@ -32,7 +32,7 @@ return [
     ],
 
     'astrology_api' => [
-        'url' => env('ASTROLOGY_API_URL'),
+        'url' => env('ASTROLOGY_API_URL', 'https://api.astrology-api.io'),
         'key' => env('ASTROLOGY_API_KEY'),
     ],
 

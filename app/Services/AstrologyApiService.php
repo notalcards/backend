@@ -8,16 +8,20 @@ use RuntimeException;
 class AstrologyApiService
 {
     private string $baseUrl;
-    private string $apiKey;
+    private ?string $apiKey;
 
     public function __construct()
     {
-        $this->baseUrl = config('services.astrology_api.url');
+        $this->baseUrl = config('services.astrology_api.url') ?: 'https://api.astrology-api.io';
         $this->apiKey = config('services.astrology_api.key');
     }
 
     private function post(string $endpoint, array $body): array
     {
+        if (empty($this->apiKey)) {
+            throw new RuntimeException('Не задан ASTROLOGY_API_KEY в .env');
+        }
+
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $this->apiKey,
             'Content-Type' => 'application/json',
