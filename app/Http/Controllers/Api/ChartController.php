@@ -118,6 +118,37 @@ class ChartController extends Controller
         return response()->json(['message' => 'Карта удалена.']);
     }
 
+    public function share(Request $request, Chart $chart): JsonResponse
+    {
+        if ($chart->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Нет доступа.'], 403);
+        }
+
+        if (!$chart->share_token) {
+            $chart->update(['share_token' => Str::uuid()]);
+        }
+
+        return response()->json(['share_token' => $chart->share_token]);
+    }
+
+    public function publicShow(string $token): JsonResponse
+    {
+        $chart = Chart::with('profile')
+            ->where('share_token', $token)
+            ->firstOrFail();
+
+        return response()->json([
+            'type'           => $chart->type,
+            'interpretation' => $chart->interpretation,
+            'created_at'     => $chart->created_at,
+            'profile'        => $chart->profile ? [
+                'name'        => $chart->profile->name,
+                'birth_date'  => $chart->profile->birth_date,
+                'birth_place' => $chart->profile->birth_place,
+            ] : null,
+        ]);
+    }
+
     public function precalculate(Request $request): JsonResponse
     {
         $validated = $request->validate([

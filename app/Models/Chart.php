@@ -17,6 +17,7 @@ class Chart extends Model
         'result_data',
         'interpretation',
         'credits_spent',
+        'share_token',
     ];
 
     protected $casts = [
