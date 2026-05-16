@@ -93,6 +93,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@1"></script>
 <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/image@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/table@latest"></script>
 
 <script>
 // Auto-generate slug from title
@@ -117,12 +119,20 @@ const editor = new EditorJS({
         list: { class: List, inlineToolbar: true },
         quote: { class: Quote, inlineToolbar: true },
         delimiter: Delimiter,
+        image: {
+            class: ImageTool,
+            config: {
+                endpoints: { byFile: '{{ route('admin.upload.image') }}' },
+                additionalRequestHeaders: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}' },
+            },
+        },
+        table: { class: Table, inlineToolbar: true },
     },
     placeholder: 'Начните писать статью...',
     i18n: {
         messages: {
             ui: { blockTunes: { toggler: { 'Click to tune': 'Настроить', 'or drag to move': 'или перетащить' } }, inlineToolbar: { converter: { 'Convert to': 'Конвертировать' } }, toolbar: { toolbox: { Add: 'Добавить' } } },
-            toolNames: { Text: 'Параграф', Heading: 'Заголовок', List: 'Список', Quote: 'Цитата', Delimiter: 'Разделитель' },
+            toolNames: { Text: 'Параграф', Heading: 'Заголовок', List: 'Список', Quote: 'Цитата', Delimiter: 'Разделитель', Image: 'Изображение', Table: 'Таблица' },
             tools: { list: { Ordered: 'Нумерованный', Unordered: 'Маркированный' } },
         }
     },
@@ -153,5 +163,11 @@ document.querySelector('form').addEventListener('submit', async function(e) {
 .cdx-block { color: #E2E0F0 !important; }
 .cdx-quote__text, .cdx-quote__caption { color: #E2E0F0 !important; background: transparent !important; border-color: rgba(124,58,237,.4) !important; }
 .ce-delimiter:before { color: #7C3AED !important; }
+.cdx-input { background: #0F0A1E !important; border-color: rgba(124,58,237,.3) !important; color: #E2E0F0 !important; }
+.tc-table { border-color: rgba(124,58,237,.3) !important; }
+.tc-cell { border-color: rgba(124,58,237,.3) !important; color: #E2E0F0 !important; background: transparent !important; }
+.tc-row:hover .tc-cell { background: rgba(124,58,237,.05) !important; }
+.tc-add-row, .tc-add-column { color: #C4B5FD !important; }
+.tc-add-row:hover, .tc-add-column:hover { background: rgba(124,58,237,.2) !important; }
 </style>
 @endsection

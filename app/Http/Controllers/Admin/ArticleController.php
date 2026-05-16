@@ -53,6 +53,55 @@ class ArticleController extends Controller
         return back()->with('success', $article->published_at ? 'Опубликована' : 'Снята с публикации');
     }
 
+    public function uploadImage(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate(['image' => 'required|image|max:10240']);
+
+        $file = $request->file('image');
+        $mime = $file->getMimeType();
+
+        $src = match (true) {
+            in_array($mime, ['image/jpeg', 'image/jpg']) => imagecreatefromjpeg($file->path()),
+            $mime === 'image/png'  => imagecreatefrompng($file->path()),
+            $mime === 'image/webp' => imagecreatefromwebp($file->path()),
+            $mime === 'image/gif'  => imagecreatefromgif($file->path()),
+            default => null,
+        };
+
+        if (!$src) {
+            return response()->json(['success' => 0, 'message' => 'Unsupported format']);
+        }
+
+        $origW = imagesx($src);
+        $origH = imagesy($src);
+        $maxW  = 1000;
+
+        if ($origW > $maxW) {
+            $newW = $maxW;
+            $newH = (int) round($origH * $maxW / $origW);
+            $dst  = imagecreatetruecolor($newW, $newH);
+            imagealphablending($dst, false);
+            imagesavealpha($dst, true);
+            imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
+            imagedestroy($src);
+            $src = $dst;
+        }
+
+        $dir = public_path('uploads/articles');
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $filename = uniqid('img_', true) . '.webp';
+        imagewebp($src, $dir . '/' . $filename, 85);
+        imagedestroy($src);
+
+        return response()->json([
+            'success' => 1,
+            'file'    => ['url' => url('uploads/articles/' . $filename)],
+        ]);
+    }
+
     private function validated(Request $request, ?int $ignoreId = null): array
     {
         $request->validate([

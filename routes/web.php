@@ -22,5 +22,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::resource('articles', Admin\ArticleController::class);
         Route::post('/articles/{article}/publish', [Admin\ArticleController::class, 'publish'])->name('articles.publish');
+        Route::post('/upload-image', [Admin\ArticleController::class, 'uploadImage'])->name('upload.image');
     });
 });
